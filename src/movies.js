@@ -109,47 +109,86 @@ function convertHMtoM(hoursMin) {
   return result;
 }
 function turnHoursToMinutes(moviesArray) {
-  const newMoviesArray = moviesArray.map(
-    (movie) => (movie.duration = convertHMtoM(movie.duration))
-  );
-  //console.log(moviesArray);
-  //console.log(newMoviesArray);
+  const newMoviesArray = moviesArray.map((movie) => ({
+    ...movie,
+    duration: convertHMtoM(movie.duration),
+  }));
+
+  console.log(newMoviesArray);
   return newMoviesArray;
 }
-
 // BONUS - Iteration 8: Best yearly score average - Best yearly score average
 function bestYearAvg(moviesArray) {
   if (moviesArray.length === 0) {
     return null;
   }
-  let bestYear = 0;
-  let bestScoreAvg = 0;
-  let moviesArrayOBY = orderByYear(moviesArray);
 
-  for (let i = 0; i < moviesArrayOBY.length; i++) {
-    let localAvg = 0;
-    let localCount = 0;
-    let localSum = 0;
-    let x = 0;
-    for (
-      let j = i;
-      moviesArrayOBY[i].year === moviesArrayOBY[j].year &&
-      j < moviesArrayOBY.length;
-      j++
-    ) {
-      x = x + 1;
-      localCount += 1;
-      localSum = moviesArrayOBY[j].score + localSum;
+  const scoresByYear = moviesArray.reduce((a, c) => {
+    if (a[c.year]) {
+      a[c.year].score += c.score;
+      a[c.year].count += 1;
+    } else {
+      a[c.year] = {
+        score: c.score,
+        count: 1,
+      };
     }
-    //i += x;
-    localAvg = localSum / localCount;
-    if (bestScoreAvg < localAvg) {
-      bestScoreAvg = localAvg;
-      bestYear = moviesArrayOBY[i].year;
+
+    return a;
+  }, {});
+
+  let bestYear = 0;
+  let resultScore = 0;
+  const yearKeys = Object.keys(scoresByYear)
+  for(let i = 0; i < yearKeys.length; i++){
+    const singleYear = scoresByYear[yearKeys[i]];
+    const avgSingleYear = singleYear.score / singleYear.count;
+    if(avgSingleYear > resultScore) {
+      bestYear = yearKeys[i];
+      resultScore = avgSingleYear;
     }
   }
+
+  console.log(scoresByYear);
   console.log(
-    `The best year was ${bestYear} with an average score of ${bestScoreAvg}`
+    `The best year was ${bestYear} with an average score of ${resultScore}`
   );
-  return `The best year was ${bestYear} with an average score of ${bestScoreAvg}`;
+  return `The best year was ${bestYear} with an average score of ${resultScore}`;
 }
+
+// BONUS - Iteration 8: Best yearly score average - Best yearly score average
+// function bestYearAvg(moviesArray) {
+//   if (moviesArray.length === 0) {
+//     return null;
+//   }
+//   let bestYear = 0;
+//   let bestScoreAvg = 0;
+//   let moviesArrayOBY = orderByYear(moviesArray);
+
+//   for (let i = 0; i < moviesArrayOBY.length; i++) {
+//     let localAvg = 0;
+//     let localCount = 0;
+//     let localSum = 0;
+//     let x = 0;
+//     for (
+//       let j = i;
+//       moviesArrayOBY[i].year === moviesArrayOBY[j].year &&
+//       j < moviesArrayOBY.length;
+//       j++
+//     ) {
+//       x = x + 1;
+//       localCount += 1;
+//       localSum = moviesArrayOBY[j].score + localSum;
+//     }
+//     //i += x;
+//     localAvg = localSum / localCount;
+//     if (bestScoreAvg < localAvg) {
+//       bestScoreAvg = localAvg;
+//       bestYear = moviesArrayOBY[i].year;
+//     }
+//   }
+//   console.log(
+//     `The best year was ${bestYear} with an average score of ${bestScoreAvg}`
+//   );
+//   return `The best year was ${bestYear} with an average score of ${bestScoreAvg}`;
+// }
